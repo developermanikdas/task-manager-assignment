@@ -13,11 +13,11 @@ const app = express();
 
 app.use(cors({
     origin: [
-      "http://localhost:5173",
-      "https://task-manager-assignment-beta-three.vercel.app/",
+        "http://localhost:5173",
+        "https://task-manager-assignment-beta-three.vercel.app",
     ],
     credentials: true,
-  }));
+}));
 app.use(helmet());
 app.use(morgan("dev"));
 
@@ -26,8 +26,17 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
+
+
+app.get("/", (req, res) => {
+    res.json({
+        success: true,
+        message: "Task Manager API Running"
+    });
+});
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/tasks", taskRoutes);
+
 
 app.use((req, res) => {
     res.status(404).json({
@@ -37,13 +46,5 @@ app.use((req, res) => {
 });
 
 app.use(errorHandler);
-
-
-app.get("/", (req, res) => {
-    res.json({
-        success: true,
-        message: "Task Manager API Running"
-    });
-});
 
 export default app;
