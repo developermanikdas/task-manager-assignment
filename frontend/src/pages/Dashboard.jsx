@@ -25,10 +25,12 @@ export default function Dashboard() {
   const [deleting, setDeleting] = useState(false);
 
   const [loadingTaskId, setLoadingTaskId] = useState(null);
-  const [loadingTasks, setLoadingTasks] = useState(true);
+  const [loadingTasks, setLoadingTasks] = useState(false);
 
-  const fetchTasks = async () => {
-    setLoadingTasks(true);
+  const fetchTasks = async (showLoader = false) => {
+    if (showLoader) {
+      setLoadingTasks(true);
+    }
 
     try {
       const res = await api.get("/tasks");
@@ -36,25 +38,19 @@ export default function Dashboard() {
     } catch (err) {
       console.log(err);
     } finally {
-      setLoadingTasks(false);
+      if (showLoader) {
+        setLoadingTasks(false);
+      }
     }
   };
-
-  useEffect(() => {
-    fetchTasks();
-  }, []);
 
   const createTask = async (data) => {
     setCreating(true);
 
     try {
-      await api.post("/tasks", data);
-
       const res = await api.post("/tasks", data);
 
       setTasks((prevTasks) => [...prevTasks, res.data.task]);
-
-      setCreateOpen(false);
 
       setCreateOpen(false);
     } catch (err) {
@@ -87,8 +83,6 @@ export default function Dashboard() {
       );
 
       setEditOpen(false);
-
-      setEditOpen(false);
     } catch (err) {
       console.log(err);
     } finally {
@@ -99,56 +93,40 @@ export default function Dashboard() {
   const toggleTask = async (task) => {
     setLoadingTaskId(task._id);
 
+    // Save current value
+    const oldCompleted = task.completed;
+
+    // Update UI immediately
+    setTasks((prevTasks) =>
+      prevTasks.map((t) =>
+        t._id === task._id
+          ? {
+              ...t,
+              completed: !oldCompleted,
+            }
+          : t,
+      ),
+    );
+
     try {
       await api.put(`/tasks/${task._id}`, {
         title: task.title,
         description: task.description,
-        completed: !task.completed,
+        completed: !oldCompleted,
       });
-
-      const toggleTask = async (task) => {
-        setLoadingTaskId(task._id);
-
-        // Save the old value in case the request fails
-        const oldCompleted = task.completed;
-
-        // Update the UI immediately
-        setTasks((prevTasks) =>
-          prevTasks.map((t) =>
-            t._id === task._id
-              ? {
-                  ...t,
-                  completed: !t.completed,
-                }
-              : t,
-          ),
-        );
-
-        try {
-          await api.put(`/tasks/${task._id}`, {
-            title: task.title,
-            description: task.description,
-            completed: !oldCompleted,
-          });
-        } catch (err) {
-          // Roll back if the API fails
-          setTasks((prevTasks) =>
-            prevTasks.map((t) =>
-              t._id === task._id
-                ? {
-                    ...t,
-                    completed: oldCompleted,
-                  }
-                : t,
-            ),
-          );
-
-          console.log(err);
-        } finally {
-          setLoadingTaskId(null);
-        }
-      };
     } catch (err) {
+      // Rollback if API fails
+      setTasks((prevTasks) =>
+        prevTasks.map((t) =>
+          t._id === task._id
+            ? {
+                ...t,
+                completed: oldCompleted,
+              }
+            : t,
+        ),
+      );
+
       console.log(err);
     } finally {
       setLoadingTaskId(null);
@@ -173,6 +151,10 @@ export default function Dashboard() {
       setDeleting(false);
     }
   };
+
+  useEffect(() => {
+    fetchTasks(true);
+  }, []);
 
   return (
     <div className="min-h-screen bg-slate-100">
