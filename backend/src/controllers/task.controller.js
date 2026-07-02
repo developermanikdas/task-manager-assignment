@@ -1,4 +1,5 @@
 import Task from "../models/Task.js";
+import ApiError from "../utils/ApiError.js";
 
 export const createTask = async (req, res) => {
     try {
@@ -45,10 +46,6 @@ export const getAllTasks = async (req, res) => {
 
 export const getTaskById = async (req, res) => {
     try {
-
-
-
-
         const task = await Task.findById(req.params.id);
 
         if (!task) {
@@ -118,35 +115,37 @@ export const updateTask = async (req, res) => {
 
 
 export const deleteTask = async (req, res) => {
-    try {
+  try {
+    const task = await Task.findById(req.params.id);
 
-
-        const task = await Task.findById(req.params.id);
-
-        if (!task) {
-           throw new ApiError(404, "Task not found");
-        }
-
-        if (
-            req.user.role !== "admin" &&
-            task.createdBy.toString() !== req.user.id
-        ) {
-            return res.status(403).json({
-                success: false,
-                message: "Access denied",
-            });
-        }
-
-        await task.deleteOne();
-
-        res.status(200).json({
-            success: true,
-            message: "Task deleted successfully",
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: error.message,
-        });
+    if (!task) {
+      return res.status(404).json({
+        success: false,
+        message: "Task not found",
+      });
     }
+
+    // Optional: prevent users from deleting others' tasks
+    if (
+      task.user.toString() !== req.user._id.toString() &&
+      req.user.role !== "admin"
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied",
+      });
+    }
+
+    await task.deleteOne();
+
+    res.status(200).json({
+      success: true,
+      message: "Task deleted successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };

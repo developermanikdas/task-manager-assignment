@@ -9,6 +9,9 @@ import TaskList from "../components/TaskList";
 import CreateTaskModal from "../components/CreateTaskModal";
 import EditTaskModal from "../components/EditTaskModal";
 import DeleteModal from "../components/DeleteModal";
+import { getErrorMessage } from "../utils/errorHandler";
+import Alert from "@mui/material/Alert";
+import Snackbar from "@mui/material/Snackbar";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -26,21 +29,32 @@ export default function Dashboard() {
 
   const [loadingTaskId, setLoadingTaskId] = useState(null);
   const [loadingTasks, setLoadingTasks] = useState(false);
+  const [error, setError] = useState("");
+  const [openSnackbar, setOpenSnackbar] = useState(false);
 
-  const fetchTasks = async (showLoader = false) => {
-    if (showLoader) {
-      setLoadingTasks(true);
+  const handleApiError = (err) => {
+    console.error(err);
+
+    setError(getErrorMessage(err));
+    setOpenSnackbar(true);
+
+    if (err.response?.status === 401) {
+      logout();
+      navigate("/");
     }
+  };
 
+  const fetchTasks = async () => {
     try {
-      const res = await api.get("/tasks");
-      setTasks(res.data.tasks);
+      setLoadingTasks(true);
+      setError("");
+      const { data } = await api.get("/tasks");
+     
+      setTasks(data.tasks || []);
     } catch (err) {
-      console.log(err);
+      handleApiError(err);
     } finally {
-      if (showLoader) {
-        setLoadingTasks(false);
-      }
+      setLoadingTasks(false);
     }
   };
 
@@ -48,13 +62,14 @@ export default function Dashboard() {
     setCreating(true);
 
     try {
+      setError("");
       const res = await api.post("/tasks", data);
 
       setTasks((prevTasks) => [...prevTasks, res.data.task]);
 
       setCreateOpen(false);
     } catch (err) {
-      console.log(err);
+      handleApiError(err);
     } finally {
       setCreating(false);
     }
@@ -64,6 +79,7 @@ export default function Dashboard() {
     setSaving(true);
 
     try {
+      setError("");
       await api.put(`/tasks/${selectedTask._id}`, {
         title: data.title,
         description: data.description,
@@ -84,7 +100,7 @@ export default function Dashboard() {
 
       setEditOpen(false);
     } catch (err) {
-      console.log(err);
+      handleApiError(err);
     } finally {
       setSaving(false);
     }
@@ -127,37 +143,52 @@ export default function Dashboard() {
         ),
       );
 
-      console.log(err);
+      handleApiError(err);
     } finally {
       setLoadingTaskId(null);
     }
   };
 
   const deleteTask = async () => {
-    setDeleting(true);
-
     try {
+      setDeleting(true);
+
+      // Clear previous error
+      setError("");
+
       await api.delete(`/tasks/${selectedTask._id}`);
 
-      setTasks((prevTasks) =>
-        prevTasks.filter((t) => t._id !== selectedTask._id),
-      );
+      setTasks((prev) => prev.filter((t) => t._id !== selectedTask._id));
 
       setDeleteOpen(false);
       setSelectedTask(null);
     } catch (err) {
-      console.log(err);
+      handleApiError(err);
     } finally {
       setDeleting(false);
     }
   };
 
   useEffect(() => {
-    fetchTasks(true);
+    fetchTasks();
   }, []);
 
   return (
     <div className="min-h-screen bg-slate-100">
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={4000}
+        onClose={() => setOpenSnackbar(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert
+          onClose={() => setOpenSnackbar(false)}
+          severity="error"
+          sx={{ width: "100%" }}
+        >
+          {error}
+        </Alert>
+      </Snackbar>
       <Navbar
         user={user}
         onCreate={() => setCreateOpen(true)}
