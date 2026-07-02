@@ -1,7 +1,7 @@
 import Task from "../models/Task.js";
 import ApiError from "../utils/ApiError.js";
 
-export const createTask = async (req, res) => {
+export const createTask = async (req, res, next) => {
     try {
         const task = await Task.create({
             ...req.body,
@@ -14,14 +14,11 @@ export const createTask = async (req, res) => {
             task,
         });
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: error.message,
-        });
+        next(error);
     }
 };
 
-export const getAllTasks = async (req, res) => {
+export const getAllTasks = async (req, res, next) => {
     try {
         let tasks;
 
@@ -37,29 +34,23 @@ export const getAllTasks = async (req, res) => {
             tasks,
         });
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: error.message,
-        });
+        next(error);
     }
 };
 
-export const getTaskById = async (req, res) => {
+export const getTaskById = async (req, res, next) => {
     try {
         const task = await Task.findById(req.params.id);
 
         if (!task) {
-           throw new ApiError(404, "Task not found");
+            throw new ApiError(404, "Task not found");
         }
 
         if (
             req.user.role !== "admin" &&
             task.createdBy.toString() !== req.user.id
         ) {
-            return res.status(403).json({
-                success: false,
-                message: "Access denied",
-            });
+            throw new ApiError(403, "Access denied");
         }
 
         res.status(200).json({
@@ -67,15 +58,12 @@ export const getTaskById = async (req, res) => {
             task,
         });
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: error.message,
-        });
+        next(error);
     }
 };
 
 
-export const updateTask = async (req, res) => {
+export const updateTask = async (req, res, next) => {
     try {
 
 
@@ -83,17 +71,14 @@ export const updateTask = async (req, res) => {
         const task = await Task.findById(req.params.id);
 
         if (!task) {
-         throw new ApiError(404, "Task not found");
+            throw new ApiError(404, "Task not found");
         }
 
         if (
             req.user.role !== "admin" &&
             task.createdBy.toString() !== req.user.id
         ) {
-            return res.status(403).json({
-                success: false,
-                message: "Access denied",
-            });
+            throw new ApiError(403, "Access denied");
         }
 
         Object.assign(task, req.body);
@@ -106,46 +91,34 @@ export const updateTask = async (req, res) => {
             task,
         });
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: error.message,
-        });
+        next(error);
     }
 };
 
 
-export const deleteTask = async (req, res) => {
-  try {
-    const task = await Task.findById(req.params.id);
+export const deleteTask = async (req, res, next) => {
+    try {
+        const task = await Task.findById(req.params.id);
 
-    if (!task) {
-      return res.status(404).json({
-        success: false,
-        message: "Task not found",
-      });
+        if (!task) {
+            throw new ApiError(404, "Task not found");
+        }
+
+        if (
+            req.user.role !== "admin" &&
+            task.createdBy.toString() !== req.user.id
+        ) {
+
+            throw new ApiError(403, "Access denied. You can only delete your own tasks.");
+        }
+
+        await task.deleteOne();
+
+        res.status(200).json({
+            success: true,
+            message: "Task deleted successfully",
+        });
+    } catch (error) {
+        next(error);
     }
-
-    // Optional: prevent users from deleting others' tasks
-    if (
-      task.user.toString() !== req.user._id.toString() &&
-      req.user.role !== "admin"
-    ) {
-      return res.status(403).json({
-        success: false,
-        message: "Access denied",
-      });
-    }
-
-    await task.deleteOne();
-
-    res.status(200).json({
-      success: true,
-      message: "Task deleted successfully",
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
 };
