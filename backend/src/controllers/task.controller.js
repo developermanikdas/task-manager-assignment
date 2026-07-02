@@ -8,10 +8,13 @@ export const createTask = async (req, res, next) => {
             createdBy: req.user.id,
         });
 
+        const populatedTask = await Task.findById(task._id)
+            .populate("createdBy", "name email");
+
         res.status(201).json({
             success: true,
             message: "Task created successfully",
-            task,
+            task: populatedTask,
         });
     } catch (error) {
         next(error);
@@ -23,9 +26,12 @@ export const getAllTasks = async (req, res, next) => {
         let tasks;
 
         if (req.user.role === "admin") {
-            tasks = await Task.find().populate("createdBy", "name email");
+            tasks = await Task.find()
+                .populate("createdBy", "name email");
         } else {
-            tasks = await Task.find({ createdBy: req.user.id });
+            tasks = await Task.find({
+                createdBy: req.user.id,
+            }).populate("createdBy", "name email");
         }
 
         res.status(200).json({
@@ -40,7 +46,8 @@ export const getAllTasks = async (req, res, next) => {
 
 export const getTaskById = async (req, res, next) => {
     try {
-        const task = await Task.findById(req.params.id);
+        const task = await Task.findById(req.params.id)
+            .populate("createdBy", "name email");
 
         if (!task) {
             throw new ApiError(404, "Task not found");
@@ -48,7 +55,7 @@ export const getTaskById = async (req, res, next) => {
 
         if (
             req.user.role !== "admin" &&
-            task.createdBy.toString() !== req.user.id
+            task.createdBy._id.toString() !== req.user.id
         ) {
             throw new ApiError(403, "Access denied");
         }
@@ -62,12 +69,8 @@ export const getTaskById = async (req, res, next) => {
     }
 };
 
-
 export const updateTask = async (req, res, next) => {
     try {
-
-
-
         const task = await Task.findById(req.params.id);
 
         if (!task) {
@@ -81,20 +84,24 @@ export const updateTask = async (req, res, next) => {
             throw new ApiError(403, "Access denied");
         }
 
-        Object.assign(task, req.body);
+        task.title = req.body.title;
+        task.description = req.body.description;
+        task.completed = req.body.completed;
 
         await task.save();
+
+        const populatedTask = await Task.findById(task._id)
+            .populate("createdBy", "name email");
 
         res.status(200).json({
             success: true,
             message: "Task updated successfully",
-            task,
+            task: populatedTask,
         });
     } catch (error) {
         next(error);
     }
 };
-
 
 export const deleteTask = async (req, res, next) => {
     try {
@@ -108,8 +115,10 @@ export const deleteTask = async (req, res, next) => {
             req.user.role !== "admin" &&
             task.createdBy.toString() !== req.user.id
         ) {
-
-            throw new ApiError(403, "Access denied. You can only delete your own tasks.");
+            throw new ApiError(
+                403,
+                "Access denied. You can only delete your own tasks."
+            );
         }
 
         await task.deleteOne();
