@@ -1,4 +1,4 @@
-import Button from "./Button";
+import { FaCheckCircle, FaRegCircle, FaPen, FaTrash } from "react-icons/fa";
 
 export default function TaskCard({
   task,
@@ -7,70 +7,81 @@ export default function TaskCard({
   onToggle,
 }) {
   return (
-    <div
-      className="
-        bg-white
-        rounded-xl
-        shadow-md
-        border
-        p-5
-        hover:shadow-lg
-        transition
-      "
-    >
-      <div className="flex justify-between items-start">
+    <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-5 transition hover:border-blue-200 hover:shadow-sm">
+
+      {/* Left */}
+      <div className="flex items-start gap-4">
+
+        <button
+          onClick={onToggle}
+          className="mt-1 transition hover:scale-110"
+        >
+          {task.completed ? (
+            <FaCheckCircle className="text-2xl text-green-500" />
+          ) : (
+            <FaRegCircle className="text-2xl text-slate-400 hover:text-blue-500" />
+          )}
+        </button>
 
         <div>
 
-          <h2 className="text-xl font-semibold">
+          <h3
+            className={`text-lg font-semibold transition ${
+              task.completed
+                ? "text-slate-400 line-through"
+                : "text-slate-800"
+            }`}
+          >
             {task.title}
-          </h2>
+          </h3>
 
-          <p className="text-gray-600 mt-2">
+          <p
+            className={`mt-1 text-sm transition ${
+              task.completed
+                ? "text-slate-400 line-through"
+                : "text-slate-500"
+            }`}
+          >
             {task.description}
           </p>
 
         </div>
 
-        <span
-          className={`px-3 py-1 rounded-full text-sm font-medium ${
-            task.completed
-              ? "bg-green-100 text-green-700"
-              : "bg-yellow-100 text-yellow-700"
-          }`}
-        >
-          {task.completed ? "Completed" : "Pending"}
-        </span>
-
       </div>
 
-      <div className="flex gap-3 mt-6">
+      {/* Right */}
+      <div className="flex items-center gap-2">
 
-        <Button
-          variant="secondary"
+        <button
           onClick={onEdit}
+          className="
+            flex h-10 w-10 items-center justify-center
+            rounded-full
+            bg-slate-100
+            text-slate-600
+            transition
+            hover:bg-slate-200
+          "
         >
-          Edit
-        </Button>
+          <FaPen size={14} />
+        </button>
 
-        <Button
-          variant="success"
-          onClick={onToggle}
-        >
-          {task.completed
-            ? "Mark Pending"
-            : "Mark Complete"}
-        </Button>
-
-        <Button
-          variant="danger"
+        <button
           onClick={onDelete}
+          className="
+            flex h-10 w-10 items-center justify-center
+            rounded-full
+            bg-red-50
+            text-red-500
+            transition
+            hover:bg-red-100
+          "
         >
-          Delete
-        </Button>
+          <FaTrash size={14} />
+        </button>
 
       </div>
 
     </div>
   );
-}
+}   

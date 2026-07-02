@@ -8,6 +8,7 @@ import Navbar from "../components/Navbar";
 import TaskList from "../components/TaskList";
 import CreateTaskModal from "../components/CreateTaskModal";
 import EditTaskModal from "../components/EditTaskModal";
+import DeleteModal from "../components/DeleteModal";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -20,6 +21,8 @@ export default function Dashboard() {
   const [editOpen, setEditOpen] = useState(false);
 
   const [selectedTask, setSelectedTask] = useState(null);
+
+  const [deleteOpen, setDeleteOpen] = useState(false);
 
   const fetchTasks = async () => {
     try {
@@ -43,19 +46,19 @@ export default function Dashboard() {
     }
   };
 
-const updateTask = async (data) => {
-  try {
-    await api.put(`/tasks/${selectedTask._id}`, {
-      title: data.title,
-      description: data.description,
-      completed: selectedTask.completed,
-    });
+  const updateTask = async (data) => {
+    try {
+      await api.put(`/tasks/${selectedTask._id}`, {
+        title: data.title,
+        description: data.description,
+        completed: selectedTask.completed,
+      });
 
-    fetchTasks();
-  } catch (err) {
-    console.log(err.response?.data || err);
-  }
-};
+      fetchTasks();
+    } catch (err) {
+      console.log(err.response?.data || err);
+    }
+  };
 
   const toggleTask = async (task) => {
     try {
@@ -71,16 +74,14 @@ const updateTask = async (data) => {
     }
   };
 
-  const deleteTask = async (task) => {
-    const confirmDelete = window.confirm(
-      "Delete this task?"
-    );
-
-    if (!confirmDelete) return;
-
+  const deleteTask = async () => {
     try {
-      await api.delete(`/tasks/${task._id}`);
+      await api.delete(`/tasks/${selectedTask._id}`);
+
       fetchTasks();
+
+      setDeleteOpen(false);
+      setSelectedTask(null);
     } catch (err) {
       console.log(err);
     }
@@ -88,7 +89,6 @@ const updateTask = async (data) => {
 
   return (
     <div className="min-h-screen bg-slate-100">
-
       <Navbar
         user={user}
         onCreate={() => setCreateOpen(true)}
@@ -99,17 +99,18 @@ const updateTask = async (data) => {
       />
 
       <main className="max-w-6xl mx-auto p-6">
-
         <TaskList
           tasks={tasks}
           onEdit={(task) => {
             setSelectedTask(task);
             setEditOpen(true);
           }}
-          onDelete={deleteTask}
+          onDelete={(task) => {
+            setSelectedTask(task);
+            setDeleteOpen(true);
+          }}
           onToggle={toggleTask}
         />
-
       </main>
 
       <CreateTaskModal
@@ -125,6 +126,11 @@ const updateTask = async (data) => {
         onSave={updateTask}
       />
 
+      <DeleteModal
+        isOpen={deleteOpen}
+        onClose={() => setDeleteOpen(false)}
+        onConfirm={deleteTask}
+      />
     </div>
   );
 }

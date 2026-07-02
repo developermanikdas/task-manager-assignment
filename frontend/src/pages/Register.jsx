@@ -1,92 +1,104 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { FaEnvelope, FaLock, FaUser, FaEye, FaEyeSlash } from "react-icons/fa";
+
 import api from "../services/api";
+import AuthLayout from "../layouts/AuthLayout";
+import Input from "../components/Input";
+import Button from "../components/Button";
+import toast from "react-hot-toast";
 
 export default function Register() {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    const [form, setForm] = useState({
-        name: "",
-        email: "",
-        password: "",
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
+
+  const handleChange = (e) => {
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value,
     });
+  };
 
-    const [message, setMessage] = useState("");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-    const handleChange = (e) => {
-        setForm({
-            ...form,
-            [e.target.name]: e.target.value,
-        });
-    };
+    setLoading(true);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    try {
+      await api.post("/auth/register", form);
+      toast.success("Account created successfully!");
 
-        try {
-            const res = await api.post("/auth/register", form);
+      setTimeout(() => {
+        navigate("/");
+      }, 1000);
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Registration failed.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-            setMessage(res.data.message);
+  return (
+    <AuthLayout
+      title="Create Account"
+      subtitle="Start managing your tasks today."
+    >
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <Input
+          icon={<FaUser />}
+          name="name"
+          placeholder="Full Name"
+          value={form.name}
+          onChange={handleChange}
+        />
 
-            setTimeout(() => {
-                navigate("/");
-            }, 1000);
+        <Input
+          icon={<FaEnvelope />}
+          type="email"
+          name="email"
+          placeholder="Email Address"
+          value={form.email}
+          onChange={handleChange}
+        />
 
-        } catch (err) {
-            setMessage(
-                err.response?.data?.message || "Registration Failed"
-            );
-        }
-    };
+        <div className="relative">
+          <Input
+            icon={<FaLock />}
+            type={showPassword ? "text" : "password"}
+            name="password"
+            placeholder="Password"
+            value={form.password}
+            onChange={handleChange}
+          />
 
-    return (
-        <div>
-            <h1>Register</h1>
-
-            <form onSubmit={handleSubmit}>
-
-                <input
-                    type="text"
-                    name="name"
-                    placeholder="Name"
-                    value={form.name}
-                    onChange={handleChange}
-                />
-
-                <br /><br />
-
-                <input
-                    type="email"
-                    name="email"
-                    placeholder="Email"
-                    value={form.email}
-                    onChange={handleChange}
-                />
-
-                <br /><br />
-
-                <input
-                    type="password"
-                    name="password"
-                    placeholder="Password"
-                    value={form.password}
-                    onChange={handleChange}
-                />
-
-                <br /><br />
-
-                <button type="submit">
-                    Register
-                </button>
-
-            </form>
-
-            <p>{message}</p>
-
-            <Link to="/">
-                Already have an account?
-            </Link>
-
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"
+          >
+            {showPassword ? <FaEyeSlash /> : <FaEye />}
+          </button>
         </div>
-    );
+
+        <Button type="submit" className="w-full">
+          {loading ? "Creating Account..." : "Create Account"}
+        </Button>
+
+        <p className="text-center text-slate-500">
+          Already have an account?{" "}
+          <Link to="/" className="text-blue-600 font-semibold hover:underline">
+            Sign In
+          </Link>
+        </p>
+      </form>
+    </AuthLayout>
+  );
 }

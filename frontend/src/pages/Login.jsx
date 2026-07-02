@@ -9,6 +9,7 @@ import { useAuth } from "../context/AuthContext";
 import AuthLayout from "../layouts/AuthLayout";
 import Input from "../components/Input";
 import Button from "../components/Button";
+import toast from "react-hot-toast";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -18,8 +19,6 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
 
   const [loading, setLoading] = useState(false);
-
-  const [message, setMessage] = useState("");
 
   const [form, setForm] = useState({
     email: "",
@@ -31,8 +30,6 @@ export default function Login() {
       ...form,
       [e.target.name]: e.target.value,
     });
-
-    setMessage("");
   };
 
   const handleSubmit = async (e) => {
@@ -44,12 +41,16 @@ export default function Login() {
       const res = await api.post("/auth/login", form);
 
       login(res.data.user, res.data.token);
+      toast.success("Welcome back!");
+      login(res.data.user, res.data.token);
 
-      navigate("/dashboard");
+      toast.success("Welcome back!");
+
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 800);
     } catch (err) {
-      setMessage(
-        err.response?.data?.message || "Login Failed"
-      );
+      toast.error(err.response?.data?.message || "Login Failed");
     } finally {
       setLoading(false);
     }
@@ -57,13 +58,10 @@ export default function Login() {
 
   return (
     <AuthLayout
-      title="Welcome Back 👋"
+      title="Welcome Back"
       subtitle="Manage your tasks efficiently."
     >
-      <form
-        onSubmit={handleSubmit}
-        className="space-y-5"
-      >
+      <form onSubmit={handleSubmit} className="space-y-5">
         <Input
           icon={<FaEnvelope />}
           type="email"
@@ -74,7 +72,6 @@ export default function Login() {
         />
 
         <div className="relative">
-
           <Input
             icon={<FaLock />}
             type={showPassword ? "text" : "password"}
@@ -86,40 +83,25 @@ export default function Login() {
 
           <button
             type="button"
-            onClick={() =>
-              setShowPassword(!showPassword)
-            }
+            onClick={() => setShowPassword(!showPassword)}
             className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"
           >
             {showPassword ? <FaEyeSlash /> : <FaEye />}
           </button>
-
         </div>
 
-        {message && (
-          <p className="text-red-500 text-sm">
-            {message}
-          </p>
-        )}
-
-        <Button
-          type="submit"
-          className="w-full"
-        >
+        <Button type="submit" className="w-full">
           {loading ? "Signing In..." : "Sign In"}
         </Button>
 
         <p className="text-center text-slate-500">
-
           Don't have an account?{" "}
-
           <Link
             to="/register"
             className="text-blue-600 font-semibold hover:underline"
           >
             Sign Up
           </Link>
-
         </p>
       </form>
     </AuthLayout>

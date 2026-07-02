@@ -6,17 +6,13 @@ export default function Button({
   className = "",
 }) {
   const variants = {
-    primary:
-      "bg-blue-600 hover:bg-blue-700 text-white",
+    primary: "bg-blue-600 hover:bg-blue-700 text-white",
 
-    success:
-      "bg-green-600 hover:bg-green-700 text-white",
+    success: "bg-green-600 hover:bg-green-700 text-white",
 
-    danger:
-      "bg-red-600 hover:bg-red-700 text-white",
+    danger: "bg-red-600 hover:bg-red-700 text-white",
 
-    secondary:
-      "bg-slate-200 hover:bg-slate-300 text-slate-800",
+    secondary: "bg-slate-200 hover:bg-slate-300 text-slate-800",
   };
 
   return (
@@ -24,16 +20,23 @@ export default function Button({
       type={type}
       onClick={onClick}
       className={`
-        px-4
-        py-2
-        rounded-lg
-        font-medium
-        transition
-        duration-200
-        shadow-sm
-        ${variants[variant]}
-        ${className}
-      `}
+w-full
+py-3
+rounded-xl
+font-semibold
+text-white
+bg-gradient-to-r
+from-blue-600
+to-indigo-600
+hover:from-blue-700
+hover:to-indigo-700
+transition-all
+duration-300
+shadow-lg
+hover:shadow-xl
+hover:-translate-y-0.5
+${className}
+`}
     >
       {children}
     </button>

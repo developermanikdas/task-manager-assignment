@@ -15,17 +15,21 @@ export default function Input({
 
       <input
         className="
-          w-full
-          border
-          rounded-xl
-          py-3
-          pl-12
-          pr-4
-          focus:outline-none
-          focus:ring-2
-          focus:ring-blue-500
-          transition
-        "
+w-full
+rounded-xl
+border
+border-slate-300
+bg-slate-50
+py-3
+pl-12
+pr-4
+text-slate-800
+placeholder:text-slate-400
+focus:border-blue-500
+focus:ring-4
+focus:ring-blue-100
+transition
+"
         type={type}
         placeholder={placeholder}
         value={value}
