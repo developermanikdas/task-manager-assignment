@@ -1,61 +1,140 @@
-# 🚀 Task Manager – Full Stack REST API with JWT Authentication
+# 🚀 Task Manager – Full Stack REST API with JWT Authentication & Role-Based Access
 
-A secure, scalable full-stack Task Manager application built with **Node.js**, **Express.js**, **MongoDB**, and **React**. The project demonstrates authentication, role-based authorization, RESTful API design, CRUD operations, and frontend integration.
+
+# 🚀 Task Manager – Backend Developer Internship Assignment
+
+A secure, scalable full-stack Task Manager application demonstrating REST API development, JWT authentication, role-based authorization, and modern frontend integration.
+
+> **Assignment Focus:** Secure backend architecture, scalable REST APIs, and clean frontend integration.
+
+A production-ready full-stack Task Manager application developed as part of the **Backend Developer Internship Assignment**.
+
+The application demonstrates secure authentication, role-based authorization, scalable REST API design, robust validation, global error handling, Swagger documentation, and a responsive React frontend.
 
 ---
 
-## 📌 Features
+# 🌐 Live Demo
 
-### 🔐 Authentication
+### Frontend
+https://task-manager-assignment-beta-three.vercel.app/
+
+### Backend API
+https://task-manager-assignment-1-d0h2.onrender.com
+
+### Swagger Documentation
+https://task-manager-assignment-1-d0h2.onrender.com/api-docs
+
+### GitHub Repository
+https://github.com/developermanikdas/task-manager-assignment
+
+---
+
+# 📌 Assignment Requirements Covered
+
+| Requirement | Status |
+|-------------|--------|
+| User Registration | ✅ |
+| User Login | ✅ |
+| Password Hashing | ✅ |
+| JWT Authentication | ✅ |
+| Role-Based Access | ✅ |
+| CRUD APIs | ✅ |
+| API Versioning | ✅ |
+| Validation | ✅ |
+| Global Error Handling | ✅ |
+| Swagger Documentation | ✅ |
+| MongoDB Database | ✅ |
+| React Frontend | ✅ |
+| Protected Dashboard | ✅ |
+| Error Messages | ✅ |
+| Success Notifications | ✅ |
+| Deployment | ✅ |
+
+---
+
+# ✨ Features
+
+## 🔐 Authentication
 
 - User Registration
 - User Login
-- Password Hashing using **bcrypt**
 - JWT Authentication
+- Password Hashing using bcrypt
 - Protected Routes
+- Persistent Login using Context API & Local Storage
 
-### 👤 Role-Based Authorization
+---
 
-- **User**
-  - Create Tasks
-  - View Own Tasks
-  - Update Own Tasks
-  - Delete Own Tasks
+## 👤 Role-Based Authorization
 
-- **Admin**
-  - View All Tasks
-  - Manage All Tasks
+### User
 
-### ✅ Task Management
+- Create Tasks
+- View Own Tasks
+- Update Own Tasks
+- Delete Own Tasks
+
+### Admin
+
+- View All Users' Tasks
+- Update Any Task
+- Delete Any Task
+- View Task Creator
+
+---
+
+## ✅ Task Management
 
 - Create Task
-- View Tasks
+- View Task
 - Update Task
 - Delete Task
-- Mark Task as Complete/Pending
+- Mark Complete / Pending
+- Optimistic UI Updates
+- Loading States
 
-### 🛡 Security
+---
+
+## 🎨 Frontend Features
+
+- Responsive Design
+- Modern UI
+- Protected Dashboard
+- Floating Action Button
+- Material UI Snackbar Notifications
+- Loading Indicators
+- Empty State UI
+- Context API Authentication
+
+---
+
+## 🛡 Security Features
 
 - Password Hashing (bcrypt)
-- JWT Token Authentication
-- Route Protection
+- JWT Authentication
+- Protected Routes
 - Role-Based Authorization
-- Request Validation using Joi
+- Joi Validation
 - MongoDB ObjectId Validation
+- Global Error Handling
+- Centralized Error Responses
 
-### 📖 API Documentation
+---
 
-- Interactive Swagger UI
+## 📖 API Documentation
+
+- Swagger UI
 - RESTful API Design
 - Standard HTTP Status Codes
+- Versioned API (`/api/v1`)
 
 ---
 
 # 🏗 Project Structure
 
-```
+```text
 Task-Manager/
-│
+
 ├── backend
 │   ├── src
 │   │   ├── config
@@ -69,16 +148,16 @@ Task-Manager/
 │   │   ├── app.js
 │   │   └── server.js
 │   │
-│   ├── .env
-│   └── package.json
+│   ├── package.json
+│   └── .env
 │
 ├── frontend
 │   ├── src
 │   │   ├── components
 │   │   ├── context
-│   │   ├── hooks
 │   │   ├── pages
 │   │   ├── services
+│   │   ├── utils
 │   │   └── App.jsx
 │   │
 │   └── package.json
@@ -94,7 +173,7 @@ Task-Manager/
 
 - Node.js
 - Express.js
-- MongoDB
+- MongoDB Atlas
 - Mongoose
 - JWT
 - bcrypt
@@ -104,12 +183,25 @@ Task-Manager/
 - Morgan
 - CORS
 
+---
+
 ## Frontend
 
 - React
+- Vite
 - React Router DOM
 - Axios
+- Tailwind CSS
+- Material UI
 - Context API
+
+---
+
+## Deployment
+
+- Vercel
+- Render
+- MongoDB Atlas
 
 ---
 
@@ -118,12 +210,12 @@ Task-Manager/
 ## Clone Repository
 
 ```bash
-git clone https://github.com/yourusername/task-manager-assignment.git
+git clone https://github.com/developermanikdas/task-manager-assignment.git
 ```
 
 ---
 
-## Backend Setup
+## Backend
 
 ```bash
 cd backend
@@ -131,19 +223,19 @@ cd backend
 npm install
 ```
 
-Create a `.env` file
+Create `.env`
 
 ```env
 PORT=5000
 
-MONGO_URI=your_mongodb_connection_string
+MONGO_URI=
 
-JWT_SECRET=your_secret_key
+JWT_SECRET=
 
 JWT_EXPIRES_IN=7d
 ```
 
-Start Backend
+Run
 
 ```bash
 npm run dev
@@ -151,7 +243,7 @@ npm run dev
 
 ---
 
-## Frontend Setup
+## Frontend
 
 ```bash
 cd frontend
@@ -169,8 +261,8 @@ npm run dev
 
 | Method | Endpoint | Description |
 |---------|----------|-------------|
-| POST | `/api/v1/auth/register` | Register User |
-| POST | `/api/v1/auth/login` | Login User |
+| POST | /api/v1/auth/register | Register User |
+| POST | /api/v1/auth/login | Login User |
 
 ---
 
@@ -178,102 +270,124 @@ npm run dev
 
 | Method | Endpoint | Description |
 |---------|----------|-------------|
-| GET | `/api/v1/tasks` | Get Tasks |
-| GET | `/api/v1/tasks/:id` | Get Task |
-| POST | `/api/v1/tasks` | Create Task |
-| PUT | `/api/v1/tasks/:id` | Update Task |
-| DELETE | `/api/v1/tasks/:id` | Delete Task |
+| GET | /api/v1/tasks | Get Tasks |
+| GET | /api/v1/tasks/:id | Get Task |
+| POST | /api/v1/tasks | Create Task |
+| PUT | /api/v1/tasks/:id | Update Task |
+| DELETE | /api/v1/tasks/:id | Delete Task |
 
 ---
 
 # 🔑 Authentication
 
-All protected endpoints require a JWT.
+All protected routes require:
 
-Example
-
-```
-Authorization: Bearer YOUR_JWT_TOKEN
+```text
+Authorization: Bearer <JWT_TOKEN>
 ```
 
 ---
 
-# 📖 Swagger Documentation
+# 📖 Swagger
 
-After starting the backend, open
+Local
 
 ```
 http://localhost:5000/api-docs
 ```
 
-to access the interactive API documentation.
+Production
+
+```
+https://YOUR-RENDER-URL.onrender.com/api-docs
+```
 
 ---
 
-# 📷 Application Flow
+# 🧪 Tested Scenarios
 
-```
-Register
-     │
-     ▼
-Login
-     │
-     ▼
-JWT Authentication
-     │
-     ▼
-Protected Dashboard
-     │
-     ▼
-Task CRUD Operations
-```
+## User
+
+- Register
+- Login
+- Create Task
+- Update Own Task
+- Delete Own Task
+- View Own Tasks
+
+---
+
+## Admin
+
+- View All Tasks
+- Update Any User's Task
+- Delete Any User's Task
+- View Task Creator
+
+---
+
+# 📸 Screenshots
+
+![Log In](image.png)
+![Sign Up](image-1.png)
+![Dashboard - Admin can see all tasks](image-2.png)
+![Update](image-3.png)
+![Swagger](image-4.png)
 
 ---
 
 # 📈 Scalability Considerations
 
-The project follows a modular MVC architecture that allows easy extension as the application grows.
+The project follows a modular MVC architecture that allows new features to be added with minimal changes.
 
-Potential production improvements include:
+Future production improvements include:
 
 - Redis Caching
-- Refresh Token Authentication
-- Docker Containerization
+- Docker
 - CI/CD Pipeline
 - Load Balancing
-- Microservice Architecture
+- Horizontal Scaling
 - API Rate Limiting
 - Centralized Logging
-- Unit & Integration Testing
-- Cloud Deployment
+- Refresh Token Authentication
+- Search & Pagination
+- Microservice Architecture
 
 ---
 
-# 📌 Future Enhancements
+# 🚀 Future Enhancements
 
 - Email Verification
 - Forgot Password
 - Refresh Tokens
-- Task Categories
-- File Attachments
-- Search & Filtering
+- Search
+- Filtering
 - Pagination
-- Sorting
-- Dark Mode
+- Categories
+- File Attachments
 - Notifications
+- Dark Mode
 
 ---
 
 # 👨‍💻 Author
 
-**Manik Das**
+## Manik Das
 
 Bachelor of Computer Applications (BCA)
 
-Passionate Backend Developer focused on building secure, scalable REST APIs using the MERN stack.
+Backend Developer | MERN Stack Developer
+
+GitHub
+
+https://github.com/developermanikdas
+
+LinkedIn
+
+https://linkedin.com/in/YOUR-LINKEDIN
 
 ---
 
 # 📄 License
 
-This project is created for educational and internship evaluation purposes.
+This project was developed as part of a Backend Developer Internship assignment and is intended for educational and evaluation purposes.
