@@ -41,6 +41,10 @@ export default function TaskCard({
           >
             {task.description}
           </p>
+          <p className="text-sm text-slate-500 mt-2">
+            Created by:{" "}
+            <span className="font-medium">{task.createdBy?.name}</span>
+          </p>
         </div>
       </div>
 

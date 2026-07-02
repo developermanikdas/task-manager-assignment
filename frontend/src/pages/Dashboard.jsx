@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 
 import api from "../services/api";
 import { useAuth } from "../context/AuthContext";
+import Fab from "@mui/material/Fab";
+import AddIcon from "@mui/icons-material/Add";
 
 import Navbar from "../components/Navbar";
 import TaskList from "../components/TaskList";
@@ -49,7 +51,7 @@ export default function Dashboard() {
       setLoadingTasks(true);
       setError("");
       const { data } = await api.get("/tasks");
-     
+
       setTasks(data.tasks || []);
     } catch (err) {
       handleApiError(err);
@@ -236,6 +238,20 @@ export default function Dashboard() {
         onConfirm={deleteTask}
         deleting={deleting}
       />
+
+      <Fab
+        color="primary"
+        aria-label="new-task"
+        onClick={() => setCreateOpen(true)}
+        sx={{
+          position: "fixed",
+          bottom: 24,
+          right: 24,
+          zIndex: 1000,
+        }}
+      >
+        <AddIcon />
+      </Fab>
     </div>
   );
 }
