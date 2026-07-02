@@ -1,19 +1,25 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import api from "../services/api";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+
+import Navbar from "../components/Navbar";
+import TaskList from "../components/TaskList";
+import CreateTaskModal from "../components/CreateTaskModal";
+import EditTaskModal from "../components/EditTaskModal";
 
 export default function Dashboard() {
   const navigate = useNavigate();
-
   const { user, logout } = useAuth();
 
   const [tasks, setTasks] = useState([]);
 
-  const [form, setForm] = useState({
-    title: "",
-    description: "",
-  });
+  const [createOpen, setCreateOpen] = useState(false);
+
+  const [editOpen, setEditOpen] = useState(false);
+
+  const [selectedTask, setSelectedTask] = useState(null);
 
   const fetchTasks = async () => {
     try {
@@ -28,22 +34,35 @@ export default function Dashboard() {
     fetchTasks();
   }, []);
 
-  const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
+  const createTask = async (data) => {
+    try {
+      await api.post("/tasks", data);
+      fetchTasks();
+    } catch (err) {
+      console.log(err);
+    }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const updateTask = async (data) => {
+  try {
+    await api.put(`/tasks/${selectedTask._id}`, {
+      title: data.title,
+      description: data.description,
+      completed: selectedTask.completed,
+    });
 
+    fetchTasks();
+  } catch (err) {
+    console.log(err.response?.data || err);
+  }
+};
+
+  const toggleTask = async (task) => {
     try {
-      await api.post("/tasks", form);
-
-      setForm({
-        title: "",
-        description: "",
+      await api.put(`/tasks/${task._id}`, {
+        title: task.title,
+        description: task.description,
+        completed: !task.completed,
       });
 
       fetchTasks();
@@ -52,9 +71,15 @@ export default function Dashboard() {
     }
   };
 
-  const deleteTask = async (id) => {
+  const deleteTask = async (task) => {
+    const confirmDelete = window.confirm(
+      "Delete this task?"
+    );
+
+    if (!confirmDelete) return;
+
     try {
-      await api.delete(`/tasks/${id}`);
+      await api.delete(`/tasks/${task._id}`);
       fetchTasks();
     } catch (err) {
       console.log(err);
@@ -62,129 +87,44 @@ export default function Dashboard() {
   };
 
   return (
-    <div>
-      <h1>Task Manager</h1>
+    <div className="min-h-screen bg-slate-100">
 
-      <h3>Welcome {user?.name}</h3>
-
-      <button
-        onClick={() => {
+      <Navbar
+        user={user}
+        onCreate={() => setCreateOpen(true)}
+        onLogout={() => {
           logout();
           navigate("/");
         }}
-      >
-        Logout
-      </button>
+      />
 
-      <hr />
+      <main className="max-w-6xl mx-auto p-6">
 
-      <h2>Create Task</h2>
-
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="title"
-          placeholder="Title"
-          value={form.title}
-          onChange={handleChange}
+        <TaskList
+          tasks={tasks}
+          onEdit={(task) => {
+            setSelectedTask(task);
+            setEditOpen(true);
+          }}
+          onDelete={deleteTask}
+          onToggle={toggleTask}
         />
 
-        <br />
-        <br />
+      </main>
 
-        <textarea
-          name="description"
-          placeholder="Description"
-          value={form.description}
-          onChange={handleChange}
-        />
+      <CreateTaskModal
+        isOpen={createOpen}
+        onClose={() => setCreateOpen(false)}
+        onCreate={createTask}
+      />
 
-        <br />
-        <br />
+      <EditTaskModal
+        isOpen={editOpen}
+        onClose={() => setEditOpen(false)}
+        task={selectedTask}
+        onSave={updateTask}
+      />
 
-        <button type="submit">Add Task</button>
-      </form>
-
-      <hr />
-
-      <h2>Your Tasks</h2>
-
-      {tasks.length === 0 ? (
-        <p>No Tasks Found</p>
-      ) : (
-        tasks.map((task) => (
-          <div
-            key={task._id}
-            style={{
-              border: "1px solid gray",
-              padding: "10px",
-              marginBottom: "10px",
-            }}
-          >
-            <h3>{task.title}</h3>
-            <p>{task.description}</p>
-            <p>{task.completed ? "✅ Completed" : "⏳ Pending"}</p>
-            <button
-              onClick={async () => {
-                try {
-                  await api.put(`/tasks/${task._id}`, {
-                    title: task.title,
-                    description: task.description,
-                    completed: !task.completed,
-                  });
-
-                  fetchTasks();
-                } catch (err) {
-                  console.log(err);
-                }
-              }}
-              style={{ marginLeft: "10px" }}
-            >
-              {task.completed ? "Mark Pending" : "Mark Complete"}
-            </button>{" "}
-            &nbsp;
-            <button
-              onClick={async () => {
-                const title = prompt("New Title", task.title);
-
-                if (!title) return;
-
-                const description = prompt("New Description", task.description);
-
-                if (description === null) return;
-
-                try {
-                  await api.put(`/tasks/${task._id}`, {
-                    title,
-                    description,
-                    completed: task.completed,
-                  });
-
-                  fetchTasks();
-                } catch (err) {
-                  console.log(err);
-                }
-              }}
-            >
-              Edit
-            </button>
-            <button
-              onClick={() => {
-                const confirmDelete = window.confirm(
-                  "Are you sure you want to delete this task?",
-                );
-
-                if (!confirmDelete) return;
-
-                deleteTask(task._id);
-              }}
-              style={{ marginLeft: "10px" }}
-            >
-              Delete
-            </button>
-          </div>
-        ))
-      )}
     </div>
   );
 }
