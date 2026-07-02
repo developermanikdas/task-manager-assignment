@@ -5,18 +5,19 @@ export default function TaskForm({
   initialData,
   onSubmit,
   submitText = "Save",
+  loading = false,
 }) {
   const [form, setForm] = useState({
     title: "",
     description: "",
   });
 
-useEffect(() => {
-  setForm({
-    title: initialData?.title || "",
-    description: initialData?.description || "",
-  });
-}, [initialData]);
+  useEffect(() => {
+    setForm({
+      title: initialData?.title || "",
+      description: initialData?.description || "",
+    });
+  }, [initialData]);
 
   const handleChange = (e) => {
     setForm({
@@ -37,14 +38,9 @@ useEffect(() => {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="space-y-5"
-    >
+    <form onSubmit={handleSubmit} className="space-y-5">
       <div>
-        <label className="block mb-2 font-medium">
-          Title
-        </label>
+        <label className="block mb-2 font-medium">Title</label>
 
         <input
           type="text"
@@ -65,9 +61,7 @@ useEffect(() => {
       </div>
 
       <div>
-        <label className="block mb-2 font-medium">
-          Description
-        </label>
+        <label className="block mb-2 font-medium">Description</label>
 
         <textarea
           name="description"
@@ -87,11 +81,15 @@ useEffect(() => {
         />
       </div>
 
-      <Button
-        type="submit"
-        className="w-full"
-      >
-        {submitText}
+      <Button type="submit" className="w-full" disabled={loading}>
+        {loading ? (
+          <div className="flex items-center justify-center gap-2">
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+            {submitText}
+          </div>
+        ) : (
+          submitText
+        )}
       </Button>
     </form>
   );

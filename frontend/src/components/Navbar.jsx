@@ -7,7 +7,7 @@ export default function Navbar({ user, onLogout, onCreate }) {
 
         <div>
           <h1 className="text-3xl font-bold text-slate-800">
-            🚀 Task Manager
+            Task Manager
           </h1>
 
           <p className="text-slate-500">

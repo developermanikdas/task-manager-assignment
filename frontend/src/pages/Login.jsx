@@ -41,10 +41,8 @@ export default function Login() {
       const res = await api.post("/auth/login", form);
 
       login(res.data.user, res.data.token);
-      toast.success("Welcome back!");
-      login(res.data.user, res.data.token);
 
-      toast.success("Welcome back!");
+      toast.success(`Welcome, ${res.data.user.name}!`);
 
       setTimeout(() => {
         navigate("/dashboard");
@@ -57,10 +55,7 @@ export default function Login() {
   };
 
   return (
-    <AuthLayout
-      title="Welcome Back"
-      subtitle="Manage your tasks efficiently."
-    >
+    <AuthLayout title="Welcome Back" subtitle="Manage your tasks efficiently.">
       <form onSubmit={handleSubmit} className="space-y-5">
         <Input
           icon={<FaEnvelope />}

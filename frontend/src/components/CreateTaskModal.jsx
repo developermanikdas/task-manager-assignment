@@ -5,18 +5,15 @@ export default function CreateTaskModal({
   isOpen,
   onClose,
   onCreate,
+  creating,
 }) {
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title="Create Task"
-    >
+    <Modal isOpen={isOpen} onClose={onClose} title="Create Task">
       <TaskForm
-        submitText="Create Task"
+        submitText={creating ? "Creating..." : "Create Task"}
+        loading={creating}
         onSubmit={(data) => {
           onCreate(data);
-          onClose();
         }}
       />
     </Modal>

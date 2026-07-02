@@ -6,21 +6,18 @@ export default function EditTaskModal({
   onClose,
   task,
   onSave,
+  saving,
 }) {
   if (!task) return null;
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title="Edit Task"
-    >
+    <Modal isOpen={isOpen} onClose={onClose} title="Edit Task">
       <TaskForm
         initialData={task}
-        submitText="Save Changes"
+        submitText={saving ? "Saving..." : "Save Changes"}
+        loading={saving}
         onSubmit={(data) => {
           onSave(data);
-          onClose();
         }}
       />
     </Modal>

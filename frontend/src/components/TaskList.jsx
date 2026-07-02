@@ -1,6 +1,20 @@
 import TaskCard from "./TaskCard";
 
-export default function TaskList({ tasks, onEdit, onDelete, onToggle }) {
+export default function TaskList({
+  tasks,
+  loading,
+  loadingTaskId,
+  onEdit,
+  onDelete,
+  onToggle,
+}) {
+  if (loading) {
+    return (
+      <div className="flex justify-center py-20">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
+      </div>
+    );
+  }
   if (tasks.length === 0) {
     return (
       <div className="text-center py-20">
@@ -19,6 +33,7 @@ export default function TaskList({ tasks, onEdit, onDelete, onToggle }) {
         <TaskCard
           key={task._id}
           task={task}
+          loading={loadingTaskId === task._id}
           onEdit={() => onEdit(task)}
           onDelete={() => onDelete(task)}
           onToggle={() => onToggle(task)}
